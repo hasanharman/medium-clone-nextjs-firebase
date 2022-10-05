@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { collection, getDocs, setDoc, doc } from "firebase/firestore";
 import { db, auth, provider } from "../firebase";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, signOut } from "firebase/auth";
 
 const MediumContext = createContext();
 
@@ -55,8 +55,40 @@ const MediumProvider = ({ children }) => {
     getPosts();
   }, []);
 
+  const addUserToFirebase = async (user) => {
+    await setDoc(doc(db, "users", user.email), {
+      email: user.email,
+      name: user.displayName,
+      imageUrl: user.photoURL,
+      followerCount: 0,
+    });
+  };
+
+  const handleUserAuth = async () => {
+    const userData = await signInWithPopup(auth, provider);
+    const user = userData.user;
+    console.log(user, "⚽");
+    setCurrentUser(user);
+    addUserToFirebase(user);
+  };
+
+  const userLogOut = async () => {
+
+    signOut(auth)
+      .then(() => {
+        setCurrentUser(null)
+        console.log("User sign out successfully!");
+      })
+      .catch((error) => {
+        // An error happened.
+        console.log("error", error);
+      });
+  };
+
   return (
-    <MediumContext.Provider value={{ posts, users }}>
+    <MediumContext.Provider
+      value={{ posts, users, handleUserAuth, currentUser, userLogOut }}
+    >
       {children}
     </MediumContext.Provider>
   );

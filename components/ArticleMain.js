@@ -32,9 +32,9 @@ const styles = {
 };
 
 function ArticleMain({ post, author }) {
-  console.log(post, author);
+  // console.log(post, author);
 
-  const formattedDate = new Date(post.data.postedOn).toLocaleString("en-US", {
+  const formattedDate = new Date(post?.data?.postedOn).toLocaleString("en-US", {
     day: "numeric",
     month: "short",
     year: 'numeric'
